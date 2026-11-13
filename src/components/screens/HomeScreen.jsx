@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   MessageSquare, Bell, CheckCircle2, Clock, Calendar, 
   Play, Zap, Flag, MessageCircle, Home, Layers, CreditCard 
@@ -8,6 +8,10 @@ import {
   EmptyTasksIllustration, EmptyMeetingsIllustration,
   OfficialBlueTick
 } from '../../assets/illustrations';
+import CalendarTab from './tabs/CalendarTab';
+import TasksTab from './tabs/TasksTab';
+import PayrollTab from './tabs/PayrollTab';
+import RolesTab from './tabs/RolesTab';
 
 export default function HomeScreen({ 
   isEmptyState = false, 
@@ -16,8 +20,10 @@ export default function HomeScreen({
   onToggleEmptyState,
   onNavigate,
   onOpenNotifications,
-  onShowNotification
+  onShowNotification,
+  initialTab = 'home'
 }) {
+  const [activeTab, setActiveTab] = useState(initialTab);
   return (
     <div className="flex flex-col min-h-full bg-[#F6F7FB] select-none relative justify-between overflow-x-hidden w-full">
       
@@ -49,7 +55,15 @@ export default function HomeScreen({
             </div>
             
             <p className="text-[11px] leading-tight truncate">
-              {isEmptyState ? (
+              {activeTab === 'calendar' ? (
+                <span className="text-[#635BFF] font-semibold">Calendar & Schedule</span>
+              ) : activeTab === 'tasks' ? (
+                <span className="text-[#635BFF] font-semibold">Tasks & Backlog</span>
+              ) : activeTab === 'payroll' ? (
+                <span className="text-[#635BFF] font-semibold">Payroll & Salary</span>
+              ) : activeTab === 'roles' ? (
+                <span className="text-[#635BFF] font-semibold">Organization & Roles</span>
+              ) : isEmptyState ? (
                 <span className="text-slate-400 font-medium">Tonald@work.com</span>
               ) : (
                 <span className="text-[#635BFF] font-semibold">{profileData.position}</span>
@@ -60,21 +74,23 @@ export default function HomeScreen({
 
         {/* Right Action Icons (Message & Bell) */}
         <div className="flex items-center space-x-2 flex-shrink-0">
-          {/* Quick Data State Toggle */}
-          <button 
-            onClick={() => {
-              onToggleEmptyState();
-              onShowNotification({
-                title: isEmptyState ? "Active Data Loaded" : "Empty State Mode",
-                message: isEmptyState ? "Displaying active schedule and assigned tasks." : "Displaying blank dashboard state.",
-                type: "info"
-              });
-            }}
-            className="text-[10px] bg-slate-100 hover:bg-slate-200 active:scale-90 text-slate-700 px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer shadow-2xs"
-            title="Toggle between Empty State and Active Data State"
-          >
-            {isEmptyState ? 'Load Data' : 'Empty State'}
-          </button>
+          {/* Quick Data State Toggle on Home Tab */}
+          {activeTab === 'home' && (
+            <button 
+              onClick={() => {
+                onToggleEmptyState();
+                onShowNotification({
+                  title: isEmptyState ? "Active Data Loaded" : "Empty State Mode",
+                  message: isEmptyState ? "Displaying active schedule and assigned tasks." : "Displaying blank dashboard state.",
+                  type: "info"
+                });
+              }}
+              className="text-[10px] bg-slate-100 hover:bg-slate-200 active:scale-90 text-slate-700 px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer shadow-2xs"
+              title="Toggle between Empty State and Active Data State"
+            >
+              {isEmptyState ? 'Load Data' : 'Empty State'}
+            </button>
+          )}
 
           {/* Messages */}
           <button 
@@ -97,8 +113,9 @@ export default function HomeScreen({
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 px-4 py-3.5 space-y-4">
+      {/* Main Content Area based on Active Tab */}
+      {activeTab === 'home' && (
+        <div className="flex-1 px-4 py-3.5 space-y-4 animate-in fade-in duration-200">
         
         {/* Banner: My Work Summary matching Screenshot 7 */}
         <div className="relative overflow-hidden rounded-[22px] bg-gradient-to-r from-[#5E48E8] via-[#6650F0] to-[#7B66FA] p-4 text-white shadow-md shadow-[#5E48E8]/20 flex items-center justify-between">
@@ -291,71 +308,137 @@ export default function HomeScreen({
             </div>
           )}
         </div>
-
       </div>
+    )}
 
-      {/* Dark Bottom Navigation Bar matching Screenshot 7 */}
+      {/* Tab 2: Calendar & Schedule */}
+      {activeTab === 'calendar' && (
+        <CalendarTab onShowNotification={onShowNotification} />
+      )}
+
+      {/* Tab 3: Tasks & Projects */}
+      {activeTab === 'tasks' && (
+        <TasksTab onShowNotification={onShowNotification} />
+      )}
+
+      {/* Tab 4: Payroll & Salary */}
+      {activeTab === 'payroll' && (
+        <PayrollTab onShowNotification={onShowNotification} profileData={profileData} />
+      )}
+
+      {/* Tab 5: Organization & Roles */}
+      {activeTab === 'roles' && (
+        <RolesTab 
+          profileData={profileData} 
+          onNavigateProfile={onNavigateProfile} 
+          onShowNotification={onShowNotification} 
+        />
+      )}
+
+      {/* Dark Bottom Navigation Bar matching Screenshot 7 & uploaded buttons */}
       <div className="sticky bottom-0 left-0 right-0 bg-[#16171B] px-6 py-2.5 flex items-center justify-between z-30 shadow-2xl border-t border-slate-800/40 select-none">
-        {/* Tab 1: Home (Active) */}
+        {/* Tab 1: Home */}
         <button 
-          onClick={() => onNavigate('home_active')}
-          className="text-white p-2 rounded-xl hover:bg-white/10 active:scale-90 transition-all flex flex-col items-center cursor-pointer"
-          title="Home"
+          type="button"
+          onClick={() => {
+            setActiveTab('home');
+            onShowNotification?.({
+              title: "Home Dashboard",
+              message: "Viewing daily presence and live dashboard.",
+              type: "info"
+            });
+          }}
+          className={`p-2 rounded-xl transition-all flex flex-col items-center cursor-pointer active:scale-90 select-none ${
+            activeTab === 'home' ? 'text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+          }`}
+          title="Home Dashboard"
         >
-          <Home className="w-5 h-5 stroke-[2.5]" />
-          <span className="w-1 h-1 bg-white rounded-full mt-0.5" />
+          <Home className="w-5 h-5 stroke-[2.2]" />
+          {activeTab === 'home' && <span className="w-1 h-1 bg-white rounded-full mt-0.5 shadow-sm" />}
         </button>
 
         {/* Tab 2: Calendar */}
         <button 
-          onClick={() => onShowNotification({
-            title: "Schedule Calendar",
-            message: "You have 2 meetings scheduled for today (27 April).",
-            type: "info"
-          })}
-          className="text-slate-400 p-2 rounded-xl hover:bg-white/10 hover:text-white active:scale-90 transition-all cursor-pointer"
-          title="Schedule"
+          type="button"
+          onClick={() => {
+            setActiveTab('calendar');
+            onShowNotification?.({
+              title: "Calendar & Schedule",
+              message: "Viewing meetings, timeline and time-off balance.",
+              type: "info"
+            });
+          }}
+          className={`p-2 rounded-xl transition-all flex flex-col items-center cursor-pointer active:scale-90 select-none ${
+            activeTab === 'calendar' ? 'text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+          }`}
+          title="Calendar Schedule"
         >
-          <Calendar className="w-5 h-5" />
+          <Calendar className="w-5 h-5 stroke-[2.2]" />
+          {activeTab === 'calendar' && <span className="w-1 h-1 bg-white rounded-full mt-0.5 shadow-sm" />}
         </button>
 
         {/* Tab 3: Tasks */}
         <button 
-          onClick={() => onShowNotification({
-            title: "Daily Tasks",
-            message: "1 task in progress: Wiring Dashboard Analytics (High priority).",
-            type: "info"
-          })}
-          className="text-slate-400 p-2 rounded-xl hover:bg-white/10 hover:text-white active:scale-90 transition-all cursor-pointer"
-          title="Tasks"
+          type="button"
+          onClick={() => {
+            setActiveTab('tasks');
+            onShowNotification?.({
+              title: "Tasks & Projects",
+              message: "Viewing active sprint tasks, priority and progress.",
+              type: "info"
+            });
+          }}
+          className={`p-2 rounded-xl transition-all flex flex-col items-center cursor-pointer active:scale-90 select-none ${
+            activeTab === 'tasks' ? 'text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+          }`}
+          title="Tasks & Backlog"
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="4" />
             <line x1="8" y1="9" x2="16" y2="9" />
             <line x1="8" y1="14" x2="13" y2="14" />
           </svg>
+          {activeTab === 'tasks' && <span className="w-1 h-1 bg-white rounded-full mt-0.5 shadow-sm" />}
         </button>
 
-        {/* Tab 4: Attendance / Presence */}
+        {/* Tab 4: Payroll & Finance */}
         <button 
-          onClick={() => onShowNotification({
-            title: "Presence Activity",
-            message: "Check-in verified: Office HQ Jalan Pemuda (Radius OK).",
-            type: "success"
-          })}
-          className="text-slate-400 p-2 rounded-xl hover:bg-white/10 hover:text-white active:scale-90 transition-all cursor-pointer"
-          title="Presence"
+          type="button"
+          onClick={() => {
+            setActiveTab('payroll');
+            onShowNotification?.({
+              title: "Payroll & Salary",
+              message: "Viewing salary breakdown, deductions and claims.",
+              type: "info"
+            });
+          }}
+          className={`p-2 rounded-xl transition-all flex flex-col items-center cursor-pointer active:scale-90 select-none ${
+            activeTab === 'payroll' ? 'text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+          }`}
+          title="Payroll & Salary"
         >
-          <CreditCard className="w-5 h-5" />
+          <CreditCard className="w-5 h-5 stroke-[2.2]" />
+          {activeTab === 'payroll' && <span className="w-1 h-1 bg-white rounded-full mt-0.5 shadow-sm" />}
         </button>
 
-        {/* Tab 5: Menu / Profile */}
+        {/* Tab 5: Organization & Roles */}
         <button 
-          onClick={onNavigateProfile}
-          className="text-slate-400 p-2 rounded-xl hover:bg-white/10 hover:text-white active:scale-90 transition-all cursor-pointer"
-          title="My Profile"
+          type="button"
+          onClick={() => {
+            setActiveTab('roles');
+            onShowNotification?.({
+              title: "Organization & Roles",
+              message: "Viewing company directory, assigned assets and profile.",
+              type: "info"
+            });
+          }}
+          className={`p-2 rounded-xl transition-all flex flex-col items-center cursor-pointer active:scale-90 select-none ${
+            activeTab === 'roles' ? 'text-white' : 'text-slate-400 hover:text-white hover:bg-white/10'
+          }`}
+          title="Organization & Roles"
         >
-          <Layers className="w-5 h-5" />
+          <Layers className="w-5 h-5 stroke-[2.2]" />
+          {activeTab === 'roles' && <span className="w-1 h-1 bg-white rounded-full mt-0.5 shadow-sm" />}
         </button>
       </div>
 

@@ -83,6 +83,10 @@ export default function App() {
     { id: 'user_profile_achievements', label: '12. My Profile (With Achievements)' },
     { id: 'home_empty', label: '13. Home Screen (Empty State)' },
     { id: 'home_active', label: '14. Home Screen (Active Data State)' },
+    { id: 'tab_calendar', label: '15. Tab 2: Calendar & Schedule' },
+    { id: 'tab_tasks', label: '16. Tab 3: Tasks & Backlog' },
+    { id: 'tab_payroll', label: '17. Tab 4: Payroll & Salary' },
+    { id: 'tab_roles', label: '18. Tab 5: Organization & Roles' },
   ];
 
   const getTimeForScreen = () => {
@@ -371,6 +375,20 @@ export default function App() {
               onNavigate={(screen) => setCurrentScreen(screen)}
               onOpenNotifications={() => setIsNotificationsOpen(true)}
               onShowNotification={showNotification}
+            />
+          )}
+
+          {/* Direct Tab Previews for Bottom Navigation */}
+          {['tab_calendar', 'tab_tasks', 'tab_payroll', 'tab_roles'].includes(currentScreen) && (
+            <HomeScreen
+              isEmptyState={false}
+              profileData={profileData}
+              onNavigateProfile={() => setCurrentScreen('user_profile_view')}
+              onToggleEmptyState={() => setCurrentScreen('home_empty')}
+              onNavigate={(screen) => setCurrentScreen(screen)}
+              onOpenNotifications={() => setIsNotificationsOpen(true)}
+              onShowNotification={showNotification}
+              initialTab={currentScreen.replace('tab_', '')}
             />
           )}
         </AppContainer>
