@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0f1015;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Global scrollbar suppression - hides all scrollbars while preserving full scrollability */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+*::-webkit-scrollbar,
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* Fast, responsive button touch handling without mobile 300ms tap delay or grey highlights */
+button, [role="button"], a, input, select {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button:active {
+  user-select: none;
+}
+
+/* Subtle glow and gradients */
+.bg-workmate-purple {
+  background-color: #635BFF;
+}
+
+.bg-workmate-gradient {
+  background: linear-gradient(135deg, #6C52EE 0%, #856BF8 50%, #B4A2FD 100%);
+}
+
+.text-workmate-purple {
+  color: #635BFF;
+}
+
+.border-workmate-purple {
+  border-color: #635BFF;
+}
